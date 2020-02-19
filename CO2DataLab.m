@@ -22,7 +22,7 @@ longrid = unique(CO2data.LON); %finds all unique longitude values
     %You can make these for any variables you want to extract - for this
     %lab you will need PCO2_SW (seawater pCO2) and SST (sea surface
     %temperature)
-p = NaN(length(longrid),length(latgrid),length(monthgrid));%<--
+S = NaN(length(longrid),length(latgrid),length(monthgrid));%<--
 %<--
 
 %% 2b. Pull out the seawater pCO2 (PCO2_SW) and sea surface temperature (SST)
@@ -36,7 +36,7 @@ p = NaN(length(longrid),length(latgrid),length(monthgrid));%<--
 %will have to pick one at a time to check - i.e. this example is just for
 %January
 
-imagesc(sst(:,:,1))
+imagesc(SST(:,:,1))
 
 %% 3b. Now pretty global maps of one month of each of SST and pCO2 data.
 %I have provided example code for plotting January sea surface temperature
@@ -45,7 +45,7 @@ imagesc(sst(:,:,1))
 
 figure(1); clf
 worldmap world
-contourfm(latgrid, longrid, sst(:,:,1)','linecolor','none');
+contourfm(latgrid, longrid, SST(:,:,1)','linecolor','none');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
 title('January Sea Surface Temperature (^oC)')
