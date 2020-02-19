@@ -1,5 +1,5 @@
 %% Add your names in a comment here at the beginning of the code!
-
+%Anita Gee Scott Rasmussen
 % Instructions: Follow through this code step by step, while also referring
 % to the overall instructions and questions from the lab assignment sheet.
 
@@ -7,20 +7,22 @@
 % The data file is included in your repository as “LDEO_GriddedCO2_month_flux_2006c.csv”
 % Your task is to write code to read this in to MATLAB
 % Hint: you can again use the function “readtable”, and use your first data lab code as an example.
-%<--
+filename = 'LDEO_GriddedCO2_month_flux_2006c.csv';
+CO2data = readtable(filename);
 
 %% 2a. Create new 3-dimensional arrays to hold reshaped data
 %Find each unique longitude, latitude, and month value that will define
 %your 3-dimensional grid
 longrid = unique(CO2data.LON); %finds all unique longitude values
- %<-- following the same approach, find all unique latitude values
+ latgrid = unique(CO2data.LAT);
+ monthgrid = unique(CO2data.MONTH);%<-- following the same approach, find all unique latitude values
  %<-- following the same approach, find all unique months
 
 %Create empty 3-dimensional arrays of NaN values to hold your reshaped data
     %You can make these for any variables you want to extract - for this
     %lab you will need PCO2_SW (seawater pCO2) and SST (sea surface
     %temperature)
-%<--
+p = NaN(length(longrid),length(latgrid),length(monthgrid));%<--
 %<--
 
 %% 2b. Pull out the seawater pCO2 (PCO2_SW) and sea surface temperature (SST)
@@ -34,7 +36,7 @@ longrid = unique(CO2data.LON); %finds all unique longitude values
 %will have to pick one at a time to check - i.e. this example is just for
 %January
 
-imagesc(SST(:,:,1))
+imagesc(sst(:,:,1))
 
 %% 3b. Now pretty global maps of one month of each of SST and pCO2 data.
 %I have provided example code for plotting January sea surface temperature
@@ -43,7 +45,7 @@ imagesc(SST(:,:,1))
 
 figure(1); clf
 worldmap world
-contourfm(latgrid, longrid, SST(:,:,1)','linecolor','none');
+contourfm(latgrid, longrid, sst(:,:,1)','linecolor','none');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
 title('January Sea Surface Temperature (^oC)')
