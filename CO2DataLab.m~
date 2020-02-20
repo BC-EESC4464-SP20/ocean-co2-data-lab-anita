@@ -84,13 +84,12 @@ title('January pco2')
 %<--
 
 %% 4. Calculate and plot a global map of annual mean pCO2
-annmean = mean(S2,3)
-figure(5); clf
-worldmap world
-contourfm(latgrid, longrid, annmean','linecolor','none');
-colorbar
-geoshow('landareas.shp','FaceColor','black')
-title('Annual Mean pco2')
+annmean = NaN(length(longrid),length(latgrid),1)
+for i = 1:72
+    for t = 1:40
+    end
+    annmean = nanmean(S2(i,t,:),'all')
+end
 
  
 
