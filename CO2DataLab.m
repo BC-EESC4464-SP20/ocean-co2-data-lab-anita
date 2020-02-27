@@ -92,12 +92,8 @@ colorbar
 geoshow('landareas.shp','FaceColor','black')
 title('Annual Mean pco2')
 
- 
-
-
-
 %% 5. Calculate and plot a global map of the difference between the annual mean seawater and atmosphere pCO2
-%<--
+
 
 %% 6. Calculate relative roles of temperature and of biology/physics in controlling seasonal cycle
 %<--
