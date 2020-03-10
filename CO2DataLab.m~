@@ -103,7 +103,7 @@ title('Annual Mean pco2 (ppm)')
 
 %% 5. Calculate and plot a global map of the difference between the annual mean seawater and atmosphere pCO2
 %<--
-filename = '2009atmCO2.xlsx';
+filename = '2000atmco2.csv';
 atmCO2data = readtable(filename);
 
 annmeanatm = mean(atmCO2data.CO2_ppm_);
@@ -243,41 +243,45 @@ ylabel('pco2 (ppm)')
 title('Biophysical and Temperature Effect observed at and near P Station')
 
 
-lonbats=abs(longrid-64.1)
-[M,I1]=min(lonbats)
+
+
 
 %% 8. Reproduce your own versions of the maps in figures 7-9 in Takahashi et al. 2002
 % But please use better colormaps!!!
 % Mark on thesese maps the locations of the three stations for which you plotted the
 % seasonal cycle above
+max_data_3d = max(data_3d, [], 3)
+%% Extra
 maxbio = nanmax(bioaffct, [], 3);
 minbio = nanmin(bioaffct,[],3);
-bioamp = maxbio - minbio;
-figure(10); clf
-worldmap world
-contourfm(latgrid, longrid, bioamp','linecolor','none');
-colorbar
-geoshow('landareas.shp','FaceColor','black')
-title('Seasonal Biological Drawdown of Seawater pco2 (ppm)')
-
+ampbio = maxbio-minbio;
 maxtemp = nanmax(tempaffct, [], 3);
 mintemp = nanmin(tempaffct,[],3);
-tempamp = maxtemp - mintemp;
+amptemp = maxtemp-mintemp;
+tempbiodiff = amptemp-ampbio;
+lat = [50 32.5 -76.5];
+lon = [ 215 295.9 176];
+figure(10); clf
+worldmap world
+contourfm(latgrid, longrid, ampbio','linecolor','none');
+colorbar
+geoshow('landareas.shp','FaceColor','black')
+plotm(lat,lon,'m.','markersize',15)
+title('Seasonal Biological Drawdown of Seawater pco2')
+
 figure(11); clf
 worldmap world
-contourfm(latgrid, longrid, tempamp','linecolor','none');
+contourfm(latgrid, longrid, amptemp','linecolor','none');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
-title('Seasonal Temperature Effect on Seawater pco2 (ppm)')
-
-tbdiff= tempamp - bioamp;
+title('Seasonal Temperature Effect on pco2')
+plotm(lat,lon,'m.','markersize',15)
 figure(12); clf
 worldmap world
-contourfm(latgrid, longrid, tbdiff','linecolor','none');
+contourfm(latgrid, longrid, tempbiodiff','linecolor','none');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
-title('The Difference (T-B) between the effects on pco2(ppm) of seasonal temperature changes and biology')
+plotm(lat,lon,'m.','markersize',15)
+title('Difference of Temperature and Biophysical Effect on pco2')
 
 
-
-%
