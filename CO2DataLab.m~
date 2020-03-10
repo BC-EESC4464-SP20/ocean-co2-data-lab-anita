@@ -1,5 +1,5 @@
 %% Add your names in a comment here at the beginning of the code!
-%Anita Gee Scott Rasmussen
+%Anita Gee and Scott Rasmussen
 % Instructions: Follow through this code step by step, while also referring
 % to the overall instructions and questions from the lab assignment sheet.
 
@@ -17,7 +17,8 @@ longrid = unique(CO2data.LON); %finds all unique longitude values
  latgrid = unique(CO2data.LAT);
  monthgrid = unique(CO2data.MONTH);%<-- following the same approach, find all unique latitude values
  %<-- following the same approach, find all unique months
-
+%Extension 1
+longrid(73)= 362.5;
 %Create empty 3-dimensional arrays of NaN values to hold your reshaped data
     %You can make these for any variables you want to extract - for this
     %lab you will need PCO2_SW (seawater pCO2) and SST (sea surface
@@ -34,9 +35,10 @@ for i = 1:height(CO2data)
     sst = CO2data.SST(i);
     d=find(long ==longrid);
     e=find(lat == latgrid);
-    f=find(month == monthgrid);  
+    f=find(month == monthgrid);   
     S(d,e,f) = sst;
 end
+
 S2 = NaN(length(longrid),length(latgrid),length(monthgrid));
 for i = 1:height(CO2data)
     lat = CO2data.LAT(i);
@@ -48,7 +50,14 @@ for i = 1:height(CO2data)
     j=find(month == monthgrid);  
     S2(g,h,j) = pco2;
 end
-
+%Extension 1
+for i = 1:12
+    for j = 1:40
+        S(73,j,i)= S(1,j,i);
+        S2(73,j,i) = S2(1,j,i);
+    end
+end    
+    
 %% 3a. Make a quick plot to check that your reshaped data looks reasonable
 %Use the imagesc plotting function, which will show a different color for
 %each grid cell in your map. Since you can't plot all months at once, you
@@ -77,61 +86,202 @@ title('January Sea Surface Temperature (^oC)')
 %interval, color of the contour lines, labels, etc.
 figure(4); clf
 worldmap world
-contourfm(latgrid, longrid, S2(:,:,1)','linecolor','none');
+contourfm(latgrid, longrid, S2(:,:,1)','linecolor','black');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
-title('January pco2')
+title('January pco2 (ppm)')
 %<--
 
 %% 4. Calculate and plot a global map of annual mean pCO2
-annmean = nanmean(S2,3)
+annmean = nanmean(S2,3);
 figure(5); clf
 worldmap world
 contourfm(latgrid, longrid, annmean','linecolor','none');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
-title('Annual Mean pco2')
-
- 
-
-
+title('Annual Mean pco2 (ppm)')
 
 %% 5. Calculate and plot a global map of the difference between the annual mean seawater and atmosphere pCO2
 %<--
-filename = '2009atmCO2data.xlsx';
+filename = '2000atmco2.csv';
 atmCO2data = readtable(filename);
 
-annmeanatm = mean(atmCO2data.CO2_ppm_)
-diff5= annmean-annmeanatm
+annmeanatm = mean(atmCO2data.CO2_ppm_);
+diff5= annmean-annmeanatm;
 
 figure(6); clf
 worldmap world
 contourfm(latgrid, longrid, diff5','linecolor','none');
 colorbar
 geoshow('landareas.shp','FaceColor','black')
-title('Annual Mean between seawater and atmospheric pco2')
+title(' Difference between Annual Mean Seawater and Atmospheric pco2 (ppm) for 2000')
 
 %% 6. Calculate relative roles of temperature and of biology/physics in controlling seasonal cycle
 
-annmeantemp = nanmean(S,3)
-annmeantemprep= repmat(annmeantemp,1,1,12)
-bioaffct= S2.*exp(0.0423.*(annmeantemprep-S))
+annmeantemp = nanmean(S,3);
+annmeantemprep= repmat(annmeantemp,1,1,12);
+bioaffct= S2.*exp(0.0423.*(annmeantemprep-S));
 
-annmean_rep= repmat(annmean,1,1,12)
-tempaffct= annmean_rep.*exp(0.0423.*(S-annmeantemprep))
+annmean_rep= repmat(annmean,1,1,12);
+tempaffct= annmean_rep.*exp(0.0423.*(S-annmeantemprep));
 
 
 %% 7. Pull out and plot the seasonal cycle data from stations of interest
 %Do for BATS, Station P, and Ross Sea (note that Ross Sea is along a
 %section of 14 degrees longitude - I picked the middle point)
-latbats=abs(latgrid-32.5)
-[M,I]=min(latbats)
+latbats=abs(latgrid-32.5);
+[~,I]=min(latbats);
 
-lonbats=abs(longrid-64.1)
-[M,I]=min(lonbats)
+lonbats=abs(longrid-(360-64.1));
+[~,I1]=min(lonbats);
+bats_sst =S(I1,I,:);
+bats_pco2 = S2(I1,I,:);
+bats_bio = bioaffct(I1,I,:);
+bats_temp = tempaffct(I1,I,:);
+figure(7); clf
+subplot(2,1,1)
+x = monthgrid
+y1 = squeeze(bats_sst(1,1,:))
+y2 = squeeze(bats_pco2(1,1,:))
+xlabel('month')
+yyaxis left
+xlabel('month')
+ylabel('SST degrees Celsius')
+plot(x,y1)
+hold on
+yyaxis right
+plot(x,y2)
+xlabel('month')
+ylabel('pco2 (ppm)')
+title('Surface Water pco2 and the temeprature of mixed layer water observed at and near BATS Station')
+subplot(2,1,2)
+x = monthgrid
+y1 = squeeze(bats_bio(1,1,:))
+y2 = squeeze(bats_temp(1,1,:))
+plot(x,y1)
+hold on
+plot(x,y2)
+hold off
+xlabel('month')
+ylabel('pco2 (ppm)')
+title('Biophysical and Temperature Effect observed at and near BATS Station')
+
+%Ross Sea
+latross=abs(latgrid+76.5);
+[~,R]=min(latross);
+
+lonross=abs(longrid-176);
+[~,R1]=min(lonross);
+ross_sst =S(R1,R,:);
+ross_pco2 = S2(R1,R,:);
+ross_bio = bioaffct(R1,R,:);
+ross_temp = tempaffct(R1,R,:);
+figure(8); clf
+subplot(2,1,1)
+x = monthgrid
+y1 = squeeze(ross_sst(1,1,:))
+y2 = squeeze(ross_pco2(1,1,:))
+xlabel('month')
+yyaxis left
+xlabel('month')
+ylabel('SST degrees Celsius')
+plot(x,y1)
+hold on
+yyaxis right
+plot(x,y2)
+xlabel('month')
+ylabel('pco2 (ppm)')
+title('Surface Water pco2 and the temeprature of mixed layer water observed at and near Ross Sea Station')
+subplot(2,1,2)
+x = monthgrid
+y1 = squeeze(ross_bio(1,1,:))
+y2 = squeeze(ross_temp(1,1,:))
+plot(x,y1)
+hold on
+plot(x,y2)
+hold off
+xlabel('month')
+ylabel('pco2 (ppm)')
+title('Biophysical and Temperature Effect observed at and near Ross Sea Station')
+
+%P Station
+latp=abs(latgrid-50);
+[~,P]=min(latp);
+
+lonp=abs(longrid-(360-145));
+[~,P1]=min(lonp);
+p_sst =S(P1,P,:);
+p_pco2 = S2(P1,P,:);
+p_bio = bioaffct(P1,P,:);
+p_temp = tempaffct(P1,P,:);
+figure(9); clf
+subplot(2,1,1)
+x = monthgrid
+y1 = squeeze(p_sst(1,1,:))
+y2 = squeeze(p_pco2(1,1,:))
+xlabel('month')
+yyaxis left
+xlabel('month')
+ylabel('SST degrees Celsius')
+plot(x,y1)
+hold on
+yyaxis right
+plot(x,y2)
+xlabel('month')
+ylabel('pco2 (ppm)')
+title('Surface Water pco2 and the temeprature of mixed layer water observed at and near P Station')
+subplot(2,1,2)
+x = monthgrid
+y1 = squeeze(p_bio(1,1,:))
+y2 = squeeze(p_temp(1,1,:))
+plot(x,y1)
+hold on
+plot(x,y2)
+hold off
+xlabel('month')
+ylabel('pco2 (ppm)')
+title('Biophysical and Temperature Effect observed at and near P Station')
+
+
+
+
+
 %% 8. Reproduce your own versions of the maps in figures 7-9 in Takahashi et al. 2002
 % But please use better colormaps!!!
 % Mark on thesese maps the locations of the three stations for which you plotted the
 % seasonal cycle above
+max_data_3d = max(data_3d, [], 3)
+%% Extra
+maxbio = nanmax(bioaffct, [], 3);
+minbio = nanmin(bioaffct,[],3);
+ampbio = maxbio-minbio;
+maxtemp = nanmax(tempaffct, [], 3);
+mintemp = nanmin(tempaffct,[],3);
+amptemp = maxtemp-mintemp;
+tempbiodiff = amptemp-ampbio;
+lat = [50 32.5 -76.5];
+lon = [ 215 295.9 176];
+figure(10); clf
+worldmap world
+contourfm(latgrid, longrid, ampbio','linecolor','none');
+colorbar
+geoshow('landareas.shp','FaceColor','black')
+plotm(lat,lon,'m.','markersize',15)
+title('Seasonal Biological Drawdown of Seawater pco2')
 
-%<--
+figure(11); clf
+worldmap world
+contourfm(latgrid, longrid, amptemp','linecolor','none');
+colorbar
+geoshow('landareas.shp','FaceColor','black')
+title('Seasonal Temperature Effect on pco2')
+plotm(lat,lon,'m.','markersize',15)
+figure(12); clf
+worldmap world
+contourfm(latgrid, longrid, tempbiodiff','linecolor','none');
+colorbar
+geoshow('landareas.shp','FaceColor','black')
+plotm(lat,lon,'m.','markersize',15)
+title('Difference of Temperature and Biophysical Effect on pco2')
+
+
