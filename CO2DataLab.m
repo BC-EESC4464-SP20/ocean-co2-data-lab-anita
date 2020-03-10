@@ -128,7 +128,7 @@ latbats=abs(latgrid-32.5)
 [M,I]=min(latbats)
 
 lonbats=abs(longrid-64.1)
-[M,I]=min(lonbats)
+[M,I1]=min(lonbats)
 %% 8. Reproduce your own versions of the maps in figures 7-9 in Takahashi et al. 2002
 % But please use better colormaps!!!
 % Mark on thesese maps the locations of the three stations for which you plotted the
